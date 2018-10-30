@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Weather</string>
+    <string name="base_url">http://api.openweathermap.org/data/2.5/</string>
+    <string name="api_key">710515c42959b419fa06439a0c8430dd</string>
+    <string name="unavailable_info">Невозможно загрузить данные</string>
+    <string name="unavailable_geo">Невозможно определить местоположение</string>
+    <string name="unavailable_permission">Нет доступа к определению местоположения</string>
+    <string name="geo_title">Отсутствуют геоданные</string>
+    <string name="geo_message">Для работы приложения необходимо включить получение данных о местоположении устройства</string>
+    <string name="net_title">Отсутствует подключение</string>
+    <string name="net_message">Для работы приложения необходимо включить передачу данных</string>
+    <string name="btn_ok">Ок</string>
+    <string name="btn_cancel">Отмена</string>
+    <string name="search_title">Поиск</string>
+    <string name="update_title">Обновить</string>
+</resources>
