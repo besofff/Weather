@@ -43,7 +43,7 @@ import com.sergeybelkin.weather.model.Weather;
 import com.sergeybelkin.weather.model.Forecast;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener{
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     private Weather mWeather;
 
@@ -54,6 +54,8 @@ public class MainActivity extends AppCompatActivity
 
     ImageView pic;
     TextView cityName, temperature, humidity, pressure, wind_speed;
+
+    AlertDialog netDialog, geoDialog, confirmDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +77,7 @@ public class MainActivity extends AppCompatActivity
         mConfig = Config.getConfig(this);
 
         mTask = (LoadRelevantWeatherTask) getLastCustomNonConfigurationInstance();
-        if (mTask == null){
+        if (mTask == null) {
             mTask = new LoadRelevantWeatherTask();
         }
         mTask.link(this);
@@ -87,7 +89,7 @@ public class MainActivity extends AppCompatActivity
         pressure = findViewById(R.id.pressure);
         wind_speed = findViewById(R.id.wind);
 
-        if (savedInstanceState != null && savedInstanceState.containsKey(Constants.OUT_STATE)){
+        if (savedInstanceState != null && savedInstanceState.containsKey(Constants.OUT_STATE)) {
             mWeather = (Weather) savedInstanceState.getSerializable(Constants.OUT_STATE);
             showCurrentWeather(mWeather);
         }
@@ -102,14 +104,17 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            if (mConfig.isAskingWhenLeaving()) {
+                showConfirmDialog();
+            } else {
+                super.onBackPressed();
+            }
         }
     }
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.nav_search:
                 try {
                     Intent intent = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
@@ -125,7 +130,7 @@ public class MainActivity extends AppCompatActivity
                 requestLocationUpdates();
                 break;
             case R.id.nav_forecast:
-                if (mWeather != null && mWeather.getForecasts() != null){
+                if (mWeather != null && mWeather.getForecasts() != null) {
                     Intent intent = new Intent(this, ForecastActivity.class);
                     intent.putExtra(Constants.PARAM_WEATHER, mWeather);
                     startActivity(intent);
@@ -136,8 +141,9 @@ public class MainActivity extends AppCompatActivity
                 startActivity(intent);
                 break;
             case R.id.nav_exit:
-                finish();
-                break;
+                if (mConfig.isAskingWhenLeaving()) {
+                    showConfirmDialog();
+                } else finish();
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -151,18 +157,18 @@ public class MainActivity extends AppCompatActivity
         outState.putSerializable(Constants.OUT_STATE, mWeather);
     }
 
-    private void requestLocationUpdates(){
+    private void requestLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(this, getString(R.string.unavailable_permission), Toast.LENGTH_SHORT).show();
             return;
         }
         if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) &&
-                mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
+                mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
             mLocationManager.requestLocationUpdates(
-                    LocationManager.GPS_PROVIDER, 1000*10, 1000*10, locationListener);
+                    LocationManager.GPS_PROVIDER, 1000 * 10, 1000 * 10, locationListener);
             mLocationManager.requestLocationUpdates(
-                    LocationManager.NETWORK_PROVIDER, 1000*10, 1000*10, locationListener);
+                    LocationManager.NETWORK_PROVIDER, 1000 * 10, 1000 * 10, locationListener);
         } else {
             showGeoMissingDialog();
         }
@@ -177,14 +183,14 @@ public class MainActivity extends AppCompatActivity
 
         if (!mConfig.isUpdatingOnStartup()) return;
 
-        if (mConfig.isUpdatingByWifiOnly()){
-            if (ConnectionDetector.isConnectedViaWifi(this)){
+        if (mConfig.isUpdatingByWifiOnly()) {
+            if (ConnectionDetector.isConnectedViaWifi(this)) {
                 requestLocationUpdates();
             } else {
                 Toast.makeText(this, "WI-FI отключен", Toast.LENGTH_SHORT).show();
             }
         } else {
-            if (ConnectionDetector.isConnected(this)){
+            if (ConnectionDetector.isConnected(this)) {
                 requestLocationUpdates();
             } else {
                 showNetMissingDialog();
@@ -192,24 +198,33 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void showNetMissingDialog(){
+    private void showNetMissingDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(getString(R.string.net_title));
         builder.setMessage(getString(R.string.net_message));
-        builder.setNegativeButton(getString(R.string.btn_cancel), netClickListener);
-        builder.setPositiveButton(getString(R.string.btn_ok), netClickListener);
+        builder.setNegativeButton(getString(R.string.btn_cancel), mDialogClickListener);
+        builder.setPositiveButton(getString(R.string.btn_ok), mDialogClickListener);
         builder.setCancelable(false);
-        builder.show();
+        netDialog = builder.show();
     }
 
-    private void showGeoMissingDialog(){
-        AlertDialog.Builder builderGeo = new AlertDialog.Builder(this);
-        builderGeo.setTitle(getString(R.string.geo_title));
-        builderGeo.setMessage(getString(R.string.geo_message));
-        builderGeo.setNegativeButton(getString(R.string.btn_cancel), geoClickListener);
-        builderGeo.setPositiveButton(getString(R.string.btn_ok), geoClickListener);
-        builderGeo.setCancelable(false);
-        builderGeo.show();
+    private void showGeoMissingDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.geo_title));
+        builder.setMessage(getString(R.string.geo_message));
+        builder.setNegativeButton(getString(R.string.btn_cancel), mDialogClickListener);
+        builder.setPositiveButton(getString(R.string.btn_ok), mDialogClickListener);
+        builder.setCancelable(false);
+        geoDialog = builder.show();
+    }
+
+    private void showConfirmDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.confirm_title));
+        builder.setMessage(getString(R.string.confirm_message));
+        builder.setNegativeButton(getString(R.string.btn_cancel), mDialogClickListener);
+        builder.setPositiveButton(getString(R.string.btn_ok), mDialogClickListener);
+        confirmDialog = builder.show();
     }
 
     @Override
@@ -218,19 +233,19 @@ public class MainActivity extends AppCompatActivity
         return mTask;
     }
 
-    static class LoadRelevantWeatherTask extends AsyncTask<Double, Weather, Weather>{
+    static class LoadRelevantWeatherTask extends AsyncTask<Double, Weather, Weather> {
 
         MainActivity activity;
         private String apiKey;
         private String baseUrl;
 
-        void link(MainActivity act){
+        void link(MainActivity act) {
             activity = act;
             apiKey = activity.getString(R.string.api_key);
             baseUrl = activity.getString(R.string.base_url);
         }
 
-        void unlink(){
+        void unlink() {
             activity = null;
         }
 
@@ -279,8 +294,8 @@ public class MainActivity extends AppCompatActivity
     private LocationListener locationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
-            double latitude = (double) Math.round(location.getLatitude()*100)/100;
-            double longitude = (double) Math.round(location.getLongitude()*100)/100;
+            double latitude = (double) Math.round(location.getLatitude() * 100) / 100;
+            double longitude = (double) Math.round(location.getLongitude() * 100) / 100;
             Double[] coordinates = new Double[]{latitude, longitude};
 
             if (mHelper.isCacheRelevant(latitude, longitude)) {
@@ -288,11 +303,11 @@ public class MainActivity extends AppCompatActivity
                 showCurrentWeather(weather);
                 mWeather = weather;
             } else {
-                if (mTask.getStatus() == AsyncTask.Status.FINISHED){
+                if (mTask.getStatus() == AsyncTask.Status.FINISHED) {
                     mTask = new LoadRelevantWeatherTask();
                     mTask.link(MainActivity.this);
                 }
-                if (mTask.getStatus() != AsyncTask.Status.RUNNING){
+                if (mTask.getStatus() != AsyncTask.Status.RUNNING) {
                     mTask.execute(coordinates);
                 }
             }
@@ -301,51 +316,57 @@ public class MainActivity extends AppCompatActivity
         }
 
         @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {}
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+        }
 
         @Override
-        public void onProviderEnabled(String provider) {}
+        public void onProviderEnabled(String provider) {
+        }
 
         @Override
-        public void onProviderDisabled(String provider) {}
-    };
-
-    private DialogInterface.OnClickListener geoClickListener = new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-            switch (which){
-                case DialogInterface.BUTTON_NEGATIVE:
-                    Toast.makeText(MainActivity.this, MainActivity.this.getString(R.string.unavailable_geo), Toast.LENGTH_SHORT).show();
-                    break;
-                case DialogInterface.BUTTON_POSITIVE:
-                    startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                    break;
-            }
+        public void onProviderDisabled(String provider) {
         }
     };
 
-    private DialogInterface.OnClickListener netClickListener = new DialogInterface.OnClickListener() {
+    private DialogInterface.OnClickListener mDialogClickListener = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
-            switch (which){
-                case DialogInterface.BUTTON_NEGATIVE:
-                    Toast.makeText(MainActivity.this, MainActivity.this.getString(R.string.unavailable_info), Toast.LENGTH_SHORT).show();
-                    break;
-                case DialogInterface.BUTTON_POSITIVE:
-                    startActivity(new Intent(Settings.ACTION_SETTINGS));
-                    break;
+            if (dialog == netDialog) {
+                switch (which) {
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        Toast.makeText(MainActivity.this, MainActivity.this.getString(R.string.unavailable_info), Toast.LENGTH_SHORT).show();
+                        break;
+                    case DialogInterface.BUTTON_POSITIVE:
+                        startActivity(new Intent(Settings.ACTION_SETTINGS));
+                        break;
+                }
+            } else if (dialog == geoDialog) {
+                switch (which) {
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        Toast.makeText(MainActivity.this, MainActivity.this.getString(R.string.unavailable_geo), Toast.LENGTH_SHORT).show();
+                        break;
+                    case DialogInterface.BUTTON_POSITIVE:
+                        startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                        break;
+                }
+            } else if (dialog == confirmDialog) {
+                switch (which) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        MainActivity.this.finish();
+                        break;
+                }
             }
         }
     };
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        switch (requestCode){
+        switch (requestCode) {
             case Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE:
                 if (resultCode == RESULT_OK) {
                     Place place = PlaceAutocomplete.getPlace(this, data);
-                    double latitude = (double) Math.round(place.getLatLng().latitude*100)/100;
-                    double longitude = (double) Math.round(place.getLatLng().longitude*100)/100;
+                    double latitude = (double) Math.round(place.getLatLng().latitude * 100) / 100;
+                    double longitude = (double) Math.round(place.getLatLng().longitude * 100) / 100;
                     Double[] coordinates = new Double[]{latitude, longitude};
 
                     if (mHelper.isCacheRelevant(latitude, longitude)) {
@@ -353,11 +374,11 @@ public class MainActivity extends AppCompatActivity
                         showCurrentWeather(weather);
                         mWeather = weather;
                     } else {
-                        if (mTask.getStatus() == AsyncTask.Status.FINISHED){
+                        if (mTask.getStatus() == AsyncTask.Status.FINISHED) {
                             mTask = new LoadRelevantWeatherTask();
                             mTask.link(MainActivity.this);
                         }
-                        if (mTask.getStatus() != AsyncTask.Status.RUNNING){
+                        if (mTask.getStatus() != AsyncTask.Status.RUNNING) {
                             mTask.execute(coordinates);
                         }
                     }
@@ -368,8 +389,8 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void showCurrentWeather(Weather weather){
-        if (weather != null){
+    private void showCurrentWeather(Weather weather) {
+        if (weather != null) {
             pic.setImageResource(getImageResId(weather));
             cityName.setText(weather.getName());
             temperature.setText(weather.getTemperature());
@@ -381,7 +402,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private int getImageResId(Weather weather){
+    private int getImageResId(Weather weather) {
         String icon = weather.getCondition().get(0).getIcon();
         return getResources().getIdentifier("_" + icon, "drawable", getPackageName());
     }

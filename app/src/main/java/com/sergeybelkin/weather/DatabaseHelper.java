@@ -69,7 +69,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         if (cursor.moveToFirst()){
             long currentTime = System.currentTimeMillis()/1000;
             long calcTime = cursor.getInt(cursor.getColumnIndex(DB_KEY_FORECAST_DATE));
-            if ((currentTime - calcTime) < 6000000) return cursor;
+            if ((currentTime - calcTime) < 60 * 30) return cursor;
         }
         return null;
     }

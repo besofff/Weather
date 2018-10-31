@@ -9,6 +9,8 @@
     <string name="geo_message">Для работы приложения необходимо включить получение данных о местоположении устройства</string>
     <string name="net_title">Отсутствует подключение</string>
     <string name="net_message">Для работы приложения необходимо включить передачу данных</string>
+    <string name="confirm_title">Подтвердите действие</string>
+    <string name="confirm_message">Вы действительно хотите выйти?</string>
     <string name="btn_ok">Ок</string>
     <string name="btn_cancel">Отмена</string>
     <string name="settings_update_wifi">Обновлять только по WI-FI</string>

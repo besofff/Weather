@@ -42,7 +42,7 @@ public class Config {
     public void setAskingWhenLeaving(boolean isAskingWhenLeaving){
         mPreferences
                 .edit()
-                .putBoolean(Constants.PREFS_KEY_ASK_WHEN_LEAVING, true)
+                .putBoolean(Constants.PREFS_KEY_ASK_WHEN_LEAVING, isAskingWhenLeaving)
                 .apply();
     }
 

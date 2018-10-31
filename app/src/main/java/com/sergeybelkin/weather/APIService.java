@@ -12,7 +12,7 @@ public interface APIService {
                                     @Query("lon") double longitude,
                                     @Query("appid") String apiKey);
 
-    @GET("forecast?units=metric&lang=ru&cnt=9")
+    @GET("forecast?units=metric&lang=ru&cnt=40")
     Call<Weather> getForecastWeather(@Query("lat") double latitude,
                                      @Query("lon") double longitude,
                                      @Query("appid") String apiKey);
