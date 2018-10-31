@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="10dp"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:id="@+id/pictureParent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:background="@color/colorItemImage">
+
+        <ImageView
+            android:id="@+id/item_pic"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_margin="5dp"
+            tools:src="@drawable/_01d"/>
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/descriptionParent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:paddingLeft="10dp"
+        android:orientation="vertical"
+        tools:background="@color/colorItem">
+
+        <TextView
+            android:id="@+id/item_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="date"
+            android:textColor="@color/colorText"/>
+
+        <TextView
+            android:id="@+id/item_temp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="temperature"
+            android:textColor="@color/colorText"/>
+
+        <TextView
+            android:id="@+id/item_pressure"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="pressure"
+            android:textColor="@color/colorText"/>
+    </LinearLayout>
+
+</LinearLayout>

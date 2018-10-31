@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.sergeybelkin.weather.SettingsActivity">
+
+
+    <TextView
+        android:id="@+id/update_by_wifi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/settings_update_wifi"
+        android:textColor="@color/colorText"
+        android:textSize="@dimen/settings_item_size"
+        android:layout_marginLeft="@dimen/horizontal_dimen"
+        android:layout_marginTop="@dimen/vertical_dimen" />
+
+    <Switch
+        android:id="@+id/switch_update_by_wifi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/update_by_wifi"
+        android:layout_alignParentRight="true"
+        android:layout_alignBaseline="@id/update_by_wifi"
+        android:layout_marginRight="@dimen/horizontal_dimen" />
+
+
+    <TextView
+        android:id="@+id/update_on_startup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/update_by_wifi"
+        android:text="@string/settings_update_start"
+        android:textColor="@color/colorText"
+        android:textSize="@dimen/settings_item_size"
+        android:layout_marginLeft="@dimen/horizontal_dimen"
+        android:layout_marginTop="@dimen/vertical_dimen"/>
+
+    <Switch
+        android:id="@+id/switch_update_on_startup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/update_on_startup"
+        android:layout_alignParentRight="true"
+        android:layout_alignBaseline="@id/update_on_startup"
+        android:layout_marginRight="@dimen/horizontal_dimen"/>
+
+    <TextView
+        android:id="@+id/ask"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/update_on_startup"
+        android:text="@string/settings_ask"
+        android:textColor="@color/colorText"
+        android:textSize="@dimen/settings_item_size"
+        android:layout_marginLeft="@dimen/horizontal_dimen"
+        android:layout_marginTop="@dimen/vertical_dimen"/>
+
+    <Switch
+        android:id="@+id/switch_ask"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/ask"
+        android:layout_alignParentRight="true"
+        android:layout_alignBaseline="@id/ask"
+        android:layout_marginRight="@dimen/horizontal_dimen"/>
+
+
+</RelativeLayout>
