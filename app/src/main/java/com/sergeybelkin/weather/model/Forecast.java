@@ -23,9 +23,6 @@ public class Forecast implements Serializable{
     @SerializedName("weather")
     @Expose
     private List<Condition> condition = null;
-    @SerializedName("clouds")
-    @Expose
-    private Clouds clouds;
     @SerializedName("wind")
     @Expose
     private Wind wind;
@@ -40,13 +37,14 @@ public class Forecast implements Serializable{
 
     public String getDate(){
         long timestampMillis = TimeUnit.SECONDS.toMillis(forecastDate);
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm\nE, dd/MM");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEEE, dd MMMM, HH:mm");
         simpleDateFormat.setTimeZone(TimeZone.getDefault());
         return simpleDateFormat.format(new Date(timestampMillis));
     }
 
     public String getTemperature(){
-        return getMain().getTemperature() + " °C";
+        double temp = (double) Math.round(getMain().getTemperature()*10)/10;
+        return temp + " °C";
     }
 
     public void setTemperature(double temperature){
@@ -59,9 +57,17 @@ public class Forecast implements Serializable{
         main.setPressure(pressure);
     }
 
+    public String getPressure(){
+        return "Давление: " + getMain().getPressure() + " мБар";
+    }
+
     public void setHumidity(int humidity){
         if (main == null) setMain(new Main());
         main.setHumidity(humidity);
+    }
+
+    public String getHumidity(){
+        return "Влажность: " + getMain().getHumidity() + " %";
     }
 
     public void setWindSpeed(double speed){
@@ -69,22 +75,8 @@ public class Forecast implements Serializable{
         wind.setSpeed(speed);
     }
 
-    public void setWindDirection(double direction){
-        if (wind == null) setWind(new Wind());
-        wind.setDegrees(direction);
-    }
-
-    public void setCloudiness(int cloudiness){
-        if (clouds == null) setClouds(new Clouds());
-        clouds.setCloudiness(cloudiness);
-    }
-
-    public void setDescription(String description){
-        if (condition == null){
-            condition = new ArrayList<>();
-            condition.add(new Condition());
-        }
-        condition.get(0).setDescription(description);
+    public String getWindSpeed(){
+        return "Скорость ветра: " + getWind().getSpeed() + " м/с";
     }
 
     public void setIcon(String icon){
@@ -109,14 +101,6 @@ public class Forecast implements Serializable{
 
     public void setCondition(List<Condition> condition) {
         this.condition = condition;
-    }
-
-    public Clouds getClouds() {
-        return clouds;
-    }
-
-    public void setClouds(Clouds clouds) {
-        this.clouds = clouds;
     }
 
     public Wind getWind() {

@@ -14,4 +14,9 @@
         android:title="@string/update_title"
         android:icon="@drawable/ic_action_update"/>
 
+    <item
+        android:id="@+id/go_to"
+        app:showAsAction="never"
+        android:title="go to"/>
+
 </menu>

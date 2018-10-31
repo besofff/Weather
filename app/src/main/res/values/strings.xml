@@ -13,4 +13,7 @@
     <string name="btn_cancel">Отмена</string>
     <string name="search_title">Поиск</string>
     <string name="update_title">Обновить</string>
+    <string name="settings_update_wifi">Обновлять только по WI-FI</string>
+    <string name="settings_update_start">Обновлять при старте</string>
+    <string name="settings_ask">Спрашивать при выходе</string>
 </resources>

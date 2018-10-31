@@ -16,9 +16,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,45 +39,43 @@ import com.sergeybelkin.weather.model.Forecast;
 
 public class MainActivity extends AppCompatActivity {
 
-    int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
-
     private Weather mWeather;
 
-    LoadRelevantWeatherTask task;
-    DatabaseHelper helper;
-    LocationManager locationManager;
+    LoadRelevantWeatherTask mTask;
+    DatabaseHelper mHelper;
+    LocationManager mLocationManager;
+    Config mConfig;
+
     ImageView pic;
-    TextView cityName, temperature, description, humidity, pressure, cloudiness, wind_speed, wind_direction;
+    TextView cityName, temperature, humidity, pressure, wind_speed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        task = (LoadRelevantWeatherTask) getLastCustomNonConfigurationInstance();
-        if (task == null){
-            task = new LoadRelevantWeatherTask();
-        }
-        task.link(this);
+        mConfig = Config.getConfig(this);
 
-        pic = findViewById(R.id.imageView);
-        cityName = findViewById(R.id.city_name);
+        mTask = (LoadRelevantWeatherTask) getLastCustomNonConfigurationInstance();
+        if (mTask == null){
+            mTask = new LoadRelevantWeatherTask();
+        }
+        mTask.link(this);
+
+        pic = findViewById(R.id.pic);
+        cityName = findViewById(R.id.city);
         temperature = findViewById(R.id.temperature);
-        description = findViewById(R.id.description);
         humidity = findViewById(R.id.humidity);
         pressure = findViewById(R.id.pressure);
-        cloudiness = findViewById(R.id.cloudiness);
-        wind_speed = findViewById(R.id.wind_speed_label);
-        wind_direction = findViewById(R.id.wind_dir_label);
+        wind_speed = findViewById(R.id.wind);
 
         if (savedInstanceState != null && savedInstanceState.containsKey(Constants.OUT_STATE)){
             mWeather = (Weather) savedInstanceState.getSerializable(Constants.OUT_STATE);
             showCurrentWeather(mWeather);
-            showForecast(mWeather);
         }
 
-        helper = DatabaseHelper.getInstance(this);
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        mHelper = DatabaseHelper.getInstance(this);
+        mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
     }
 
     @Override
@@ -89,47 +85,70 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void requestLocationUpdates(){
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(this, getString(R.string.unavailable_permission), Toast.LENGTH_SHORT).show();
             return;
         }
-        locationManager.requestLocationUpdates(
-                LocationManager.GPS_PROVIDER, 1000*10, 1000*10, locationListener);
-        locationManager.requestLocationUpdates(
-                LocationManager.NETWORK_PROVIDER, 1000*10, 1000*10, locationListener);
+        if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) &&
+                mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
+            mLocationManager.requestLocationUpdates(
+                    LocationManager.GPS_PROVIDER, 1000*10, 1000*10, locationListener);
+            mLocationManager.requestLocationUpdates(
+                    LocationManager.NETWORK_PROVIDER, 1000*10, 1000*10, locationListener);
+        } else {
+            showGeoMissingDialog();
+        }
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
         if (mWeather != null) return;
 
-        if (!ConnectionDetector.isConnected(this)){
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle(getString(R.string.net_title));
-            builder.setMessage(getString(R.string.net_message));
-            builder.setNegativeButton(getString(R.string.btn_cancel), netClickListener);
-            builder.setPositiveButton(getString(R.string.btn_ok), netClickListener);
-            builder.setCancelable(false);
-            builder.show();
+        if (!mConfig.isUpdatingOnStartup()) return;
+
+        if (mConfig.isUpdatingByWifiOnly()){
+            if (ConnectionDetector.isConnectedViaWifi(this)){
+                requestLocationUpdates();
+            } else {
+                Toast.makeText(this, "WI-FI отключен", Toast.LENGTH_SHORT).show();
+            }
         } else {
-            if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) &&
-                    !locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
-                AlertDialog.Builder builderGeo = new AlertDialog.Builder(this);
-                builderGeo.setTitle(getString(R.string.geo_title));
-                builderGeo.setMessage(getString(R.string.geo_message));
-                builderGeo.setNegativeButton(getString(R.string.btn_cancel), geoClickListener);
-                builderGeo.setPositiveButton(getString(R.string.btn_ok), geoClickListener);
-                builderGeo.setCancelable(false);
-                builderGeo.show();
-            } else requestLocationUpdates();
+            if (ConnectionDetector.isConnected(this)){
+                requestLocationUpdates();
+            } else {
+                showNetMissingDialog();
+            }
         }
+    }
+
+    private void showNetMissingDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.net_title));
+        builder.setMessage(getString(R.string.net_message));
+        builder.setNegativeButton(getString(R.string.btn_cancel), netClickListener);
+        builder.setPositiveButton(getString(R.string.btn_ok), netClickListener);
+        builder.setCancelable(false);
+        builder.show();
+    }
+
+    private void showGeoMissingDialog(){
+        AlertDialog.Builder builderGeo = new AlertDialog.Builder(this);
+        builderGeo.setTitle(getString(R.string.geo_title));
+        builderGeo.setMessage(getString(R.string.geo_message));
+        builderGeo.setNegativeButton(getString(R.string.btn_cancel), geoClickListener);
+        builderGeo.setPositiveButton(getString(R.string.btn_ok), geoClickListener);
+        builderGeo.setCancelable(false);
+        builderGeo.show();
     }
 
     @Override
     public Object onRetainCustomNonConfigurationInstance() {
-        task.unlink();
-        return task;
+        mTask.unlink();
+        return mTask;
     }
 
     static class LoadRelevantWeatherTask extends AsyncTask<Double, Weather, Weather>{
@@ -151,7 +170,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Weather weather) {
             super.onPostExecute(weather);
-            activity.showForecast(weather);
             activity.mWeather = weather;
         }
 
@@ -160,6 +178,7 @@ public class MainActivity extends AppCompatActivity {
             super.onProgressUpdate(values);
             if (values[0] != null) {
                 activity.showCurrentWeather(values[0]);
+                activity.mWeather = values[0];
             }
         }
 
@@ -180,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
                 List<Forecast> forecasts = response.body().getForecasts();
                 if (weather != null & forecasts != null) {
                     weather.setForecasts(forecasts);
-                    activity.helper.updateDB(weather);
+                    activity.mHelper.updateDB(weather);
                 }
                 return weather;
             } catch (IOException e) {
@@ -197,21 +216,21 @@ public class MainActivity extends AppCompatActivity {
             double longitude = (double) Math.round(location.getLongitude()*100)/100;
             Double[] coordinates = new Double[]{latitude, longitude};
 
-            if (helper.isCacheRelevant(latitude, longitude)) {
-                Weather weather = helper.getWeather(latitude, longitude);
+            if (mHelper.isCacheRelevant(latitude, longitude)) {
+                Weather weather = mHelper.getWeather(latitude, longitude);
                 showCurrentWeather(weather);
-                showForecast(weather);
+                mWeather = weather;
             } else {
-                if (task.getStatus() == AsyncTask.Status.FINISHED){
-                    task = new LoadRelevantWeatherTask();
-                    task.link(MainActivity.this);
+                if (mTask.getStatus() == AsyncTask.Status.FINISHED){
+                    mTask = new LoadRelevantWeatherTask();
+                    mTask.link(MainActivity.this);
                 }
-                if (task.getStatus() != AsyncTask.Status.RUNNING){
-                    task.execute(coordinates);
+                if (mTask.getStatus() != AsyncTask.Status.RUNNING){
+                    mTask.execute(coordinates);
                 }
             }
 
-            locationManager.removeUpdates(this);
+            mLocationManager.removeUpdates(this);
         }
 
         @Override
@@ -268,12 +287,23 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     Intent intent = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
                                     .build(this);
-                    startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
+                    startActivityForResult(intent, Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE);
                 } catch (GooglePlayServicesRepairableException e) {
                     e.printStackTrace();
                 } catch (GooglePlayServicesNotAvailableException e) {
                     e.printStackTrace();
                 }
+                break;
+            case R.id.go_to:
+                /*
+                if (mWeather != null && mWeather.getForecasts() != null){
+                    Intent intent = new Intent(this, ForecastActivity.class);
+                    intent.putExtra(Constants.PARAM_WEATHER, mWeather);
+                    startActivity(intent);
+                }
+                */
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -281,56 +311,31 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
-            if (resultCode == RESULT_OK) {
-                Place place = PlaceAutocomplete.getPlace(this, data);
-                double latitude = (double) Math.round(place.getLatLng().latitude*100)/100;
-                double longitude = (double) Math.round(place.getLatLng().longitude*100)/100;
-                Double[] coordinates = new Double[]{latitude, longitude};
+        switch (requestCode){
+            case Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE:
+                if (resultCode == RESULT_OK) {
+                    Place place = PlaceAutocomplete.getPlace(this, data);
+                    double latitude = (double) Math.round(place.getLatLng().latitude*100)/100;
+                    double longitude = (double) Math.round(place.getLatLng().longitude*100)/100;
+                    Double[] coordinates = new Double[]{latitude, longitude};
 
-                if (helper.isCacheRelevant(latitude, longitude)) {
-                    Weather weather = helper.getWeather(latitude, longitude);
-                    showCurrentWeather(weather);
-                    showForecast(weather);
-                } else {
-                    if (task.getStatus() == AsyncTask.Status.FINISHED){
-                        task = new LoadRelevantWeatherTask();
-                        task.link(MainActivity.this);
+                    if (mHelper.isCacheRelevant(latitude, longitude)) {
+                        Weather weather = mHelper.getWeather(latitude, longitude);
+                        showCurrentWeather(weather);
+                        mWeather = weather;
+                    } else {
+                        if (mTask.getStatus() == AsyncTask.Status.FINISHED){
+                            mTask = new LoadRelevantWeatherTask();
+                            mTask.link(MainActivity.this);
+                        }
+                        if (mTask.getStatus() != AsyncTask.Status.RUNNING){
+                            mTask.execute(coordinates);
+                        }
                     }
-                    if (task.getStatus() != AsyncTask.Status.RUNNING){
-                        task.execute(coordinates);
-                    }
+                } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
+                    Toast.makeText(this, getString(R.string.unavailable_info), Toast.LENGTH_SHORT).show();
                 }
-            } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
-                Toast.makeText(this, getString(R.string.unavailable_info), Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-    private void showForecast(Weather weather){
-        int size = ViewGroup.LayoutParams.WRAP_CONTENT;
-        ViewGroup.LayoutParams textParams = new ViewGroup.LayoutParams(size, size);
-        LinearLayout parent = findViewById(R.id.parent);
-
-        List<Forecast> forecasts = weather.getForecasts();
-        for (int i = 0; i < forecasts.size(); i++){
-            LinearLayout layout = parent.findViewWithTag(String.valueOf(i+1));
-            layout.removeAllViews();
-            Forecast forecast = forecasts.get(i);
-
-            TextView dateTV = new TextView(this);
-            dateTV.setText(forecast.getDate());
-            layout.addView(dateTV, textParams);
-
-            TextView tempTV = new TextView(this);
-            tempTV.setText(forecast.getTemperature());
-            layout.addView(tempTV, textParams);
-
-            ImageView icon = new ImageView(this);
-            icon.setImageResource(getImageResId(forecast));
-            icon.setMaxWidth(40);
-            icon.setMaxHeight(40);
-            layout.addView(icon);
+                break;
         }
     }
 
@@ -339,12 +344,9 @@ public class MainActivity extends AppCompatActivity {
             pic.setImageResource(getImageResId(weather));
             cityName.setText(weather.getName());
             temperature.setText(weather.getTemperature());
-            description.setText(weather.getDescription());
             humidity.setText(weather.getHumidity());
             pressure.setText(weather.getPressure());
-            cloudiness.setText(weather.getCloudiness());
             wind_speed.setText(weather.getWindSpeed());
-            wind_direction.setText(weather.getWindDirection());
         } else {
             Toast.makeText(this, getString(R.string.unavailable_info), Toast.LENGTH_SHORT).show();
         }
@@ -352,11 +354,6 @@ public class MainActivity extends AppCompatActivity {
 
     private int getImageResId(Weather weather){
         String icon = weather.getCondition().get(0).getIcon();
-        return getResources().getIdentifier("_" + icon, "drawable", getPackageName());
-    }
-
-    private int getImageResId(Forecast forecast){
-        String icon = forecast.getCondition().get(0).getIcon();
         return getResources().getIdentifier("_" + icon, "drawable", getPackageName());
     }
 }

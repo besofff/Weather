@@ -37,13 +37,10 @@ public class DatabaseHelper extends SQLiteOpenHelper{
                 DB_KEY_NAME +" TEXT, "+
                 DB_KEY_LONGITUDE +" REAL, "+
                 DB_KEY_LATITUDE +" REAL, "+
-                DB_KEY_WEATHER_CONDITION +" TEXT, "+
                 DB_KEY_TEMPERATURE +" REAL, "+
                 DB_KEY_PRESSURE +" REAL, "+
                 DB_KEY_HUMIDITY +" INTEGER, "+
                 DB_KEY_WIND_SPEED +" REAL, "+
-                DB_KEY_WIND_DIRECTION +" REAL, "+
-                DB_KEY_CLOUDINESS +" INTEGER, "+
                 DB_KEY_FORECAST_DATE +" INTEGER, "+
                 DB_KEY_ICON +" TEXT);");
     }
@@ -72,7 +69,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         if (cursor.moveToFirst()){
             long currentTime = System.currentTimeMillis()/1000;
             long calcTime = cursor.getInt(cursor.getColumnIndex(DB_KEY_FORECAST_DATE));
-            if ((currentTime - calcTime) < 600) return cursor;
+            if ((currentTime - calcTime) < 6000000) return cursor;
         }
         return null;
     }
@@ -86,13 +83,10 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         Cursor cursor = checkCacheRelevance(latitude, longitude);
         if (cursor != null){
             String name = cursor.getString(cursor.getColumnIndex(DB_KEY_NAME));
-            String description = cursor.getString(cursor.getColumnIndex(DB_KEY_WEATHER_CONDITION));
             double temperature = cursor.getDouble(cursor.getColumnIndex(DB_KEY_TEMPERATURE));
             double pressure = cursor.getDouble(cursor.getColumnIndex(DB_KEY_PRESSURE));
             int humidity = cursor.getInt(cursor.getColumnIndex(DB_KEY_HUMIDITY));
             double windSpeed = cursor.getDouble(cursor.getColumnIndex(DB_KEY_WIND_SPEED));
-            double windDirection = cursor.getDouble(cursor.getColumnIndex(DB_KEY_WIND_DIRECTION));
-            int cloudiness = cursor.getInt(cursor.getColumnIndex(DB_KEY_CLOUDINESS));
             int calcDate = cursor.getInt(cursor.getColumnIndex(DB_KEY_FORECAST_DATE));
             String icon = cursor.getString(cursor.getColumnIndex(DB_KEY_ICON));
 
@@ -100,13 +94,10 @@ public class DatabaseHelper extends SQLiteOpenHelper{
             weather.setLatitude(latitude);
             weather.setLongitude(longitude);
             weather.setName(name);
-            weather.setDescription(description);
             weather.setTemperature(temperature);
             weather.setPressure(pressure);
             weather.setHumidity(humidity);
             weather.setWindSpeed(windSpeed);
-            weather.setWindDirection(windDirection);
-            weather.setCloudiness(cloudiness);
             weather.setCalculationDate(calcDate);
             weather.setIcon(icon);
             weather.setForecasts(getForecasts(cursor));
@@ -118,24 +109,18 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     private List<Forecast> getForecasts(Cursor cursor){
         List<Forecast> list = new ArrayList<>();
         while (cursor.moveToNext()){
-            String description = cursor.getString(cursor.getColumnIndex(DB_KEY_WEATHER_CONDITION));
             double temperature = cursor.getDouble(cursor.getColumnIndex(DB_KEY_TEMPERATURE));
             double pressure = cursor.getDouble(cursor.getColumnIndex(DB_KEY_PRESSURE));
             int humidity = cursor.getInt(cursor.getColumnIndex(DB_KEY_HUMIDITY));
             double windSpeed = cursor.getDouble(cursor.getColumnIndex(DB_KEY_WIND_SPEED));
-            double windDirection = cursor.getDouble(cursor.getColumnIndex(DB_KEY_WIND_DIRECTION));
-            int cloudiness = cursor.getInt(cursor.getColumnIndex(DB_KEY_CLOUDINESS));
             int forecastDate = cursor.getInt(cursor.getColumnIndex(DB_KEY_FORECAST_DATE));
             String icon = cursor.getString(cursor.getColumnIndex(DB_KEY_ICON));
 
             Forecast forecast = new Forecast();
-            forecast.setDescription(description);
             forecast.setTemperature(temperature);
             forecast.setPressure(pressure);
             forecast.setHumidity(humidity);
             forecast.setWindSpeed(windSpeed);
-            forecast.setWindDirection(windDirection);
-            forecast.setCloudiness(cloudiness);
             forecast.setForecastDate(forecastDate);
             forecast.setIcon(icon);
             list.add(forecast);
@@ -161,13 +146,10 @@ public class DatabaseHelper extends SQLiteOpenHelper{
             double longitude = (double) Math.round(weather.getCoordinates().getLongitude()*10)/10;
 
             ContentValues cv = new ContentValues();
-            cv.put(DB_KEY_WEATHER_CONDITION, weather.getDescription());
             cv.put(DB_KEY_TEMPERATURE, weather.getMain().getTemperature());
             cv.put(DB_KEY_PRESSURE, weather.getMain().getPressure());
             cv.put(DB_KEY_HUMIDITY, weather.getMain().getHumidity());
             cv.put(DB_KEY_WIND_SPEED, weather.getWind().getSpeed());
-            cv.put(DB_KEY_WIND_DIRECTION, weather.getWind().getDegrees());
-            cv.put(DB_KEY_CLOUDINESS, weather.getClouds().getCloudiness());
             cv.put(DB_KEY_FORECAST_DATE, weather.getCalculationDate());
             cv.put(DB_KEY_ICON, weather.getIcon());
 
@@ -200,13 +182,10 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
     private ContentValues getContentValues(Forecast forecast){
         ContentValues cv = new ContentValues();
-        cv.put(DB_KEY_WEATHER_CONDITION, forecast.getCondition().get(0).getDescription());
         cv.put(DB_KEY_TEMPERATURE, forecast.getMain().getTemperature());
         cv.put(DB_KEY_PRESSURE, forecast.getMain().getPressure());
         cv.put(DB_KEY_HUMIDITY, forecast.getMain().getHumidity());
         cv.put(DB_KEY_WIND_SPEED, forecast.getWind().getSpeed());
-        cv.put(DB_KEY_WIND_DIRECTION, forecast.getWind().getDegrees());
-        cv.put(DB_KEY_CLOUDINESS, forecast.getClouds().getCloudiness());
         cv.put(DB_KEY_FORECAST_DATE, forecast.getForecastDate());
         cv.put(DB_KEY_ICON, forecast.getCondition().get(0).getIcon());
         return cv;

@@ -22,9 +22,6 @@ public class Weather implements Serializable{
     @SerializedName("wind")
     @Expose
     private Wind wind;
-    @SerializedName("clouds")
-    @Expose
-    private Clouds clouds;
     @SerializedName("list")
     @Expose
     private List<Forecast> forecasts = null;
@@ -70,14 +67,6 @@ public class Weather implements Serializable{
         this.wind = wind;
     }
 
-    public Clouds getClouds() {
-        return clouds;
-    }
-
-    public void setClouds(Clouds clouds) {
-        this.clouds = clouds;
-    }
-
     public Integer getCalculationDate() {
         return calculationDate;
     }
@@ -110,18 +99,6 @@ public class Weather implements Serializable{
         this.city = city;
     }
 
-    public void setDescription(String description){
-        if (condition == null){
-            condition = new ArrayList<>();
-            condition.add(new Condition());
-        }
-        condition.get(0).setDescription(description);
-    }
-
-    public String getDescription(){
-        return condition.get(0).getDescription();
-    }
-
     public void setLatitude(double latitude){
         if (coordinates == null) setCoordinates(new Coordinates());
         coordinates.setLatitude(latitude);
@@ -138,7 +115,8 @@ public class Weather implements Serializable{
     }
 
     public String getTemperature(){
-        return getMain().getTemperature() + " °C";
+        double temp = (double) Math.round(getMain().getTemperature()*10)/10;
+        return temp + " °C";
     }
 
     public void setPressure(double pressure){
@@ -166,47 +144,6 @@ public class Weather implements Serializable{
 
     public String getWindSpeed(){
         return "Скорость ветра: " + getWind().getSpeed() + " м/с";
-    }
-
-    public void setWindDirection(double direction){
-        if (wind == null) setWind(new Wind());
-        wind.setDegrees(direction);
-    }
-
-    public String getWindDirection(){
-        return "Направление ветра: " + getWindDirection(getWind().getDegrees());
-    }
-
-    private String getWindDirection(double degrees){
-
-        String direction = null;
-        if (degrees >= 337.5 | degrees < 22.5){
-            direction = "север";
-        } else if (degrees >= 292.5){
-            direction = "северо-запад";
-        } else if (degrees >= 247.5){
-            direction = "запад";
-        } else if (degrees >= 202.5){
-            direction = "юго-запад";
-        } else if (degrees >= 157.5){
-            direction = "юг";
-        } else if (degrees >= 112.5){
-            direction = "юго-восток";
-        } else if (degrees >= 67.5){
-            direction = "восток";
-        } else if (degrees >= 22.5){
-            direction = "северо-восток";
-        }
-        return direction;
-    }
-
-    public void setCloudiness(int cloudiness){
-        if (clouds == null) setClouds(new Clouds());
-        clouds.setCloudiness(cloudiness);
-    }
-
-    public String getCloudiness(){
-        return "Облачность: " + getClouds().getCloudiness() + " %";
     }
 
     public void setIcon(String icon){
