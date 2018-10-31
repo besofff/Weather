@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="176dp"
+    android:background="@color/colorHeaderBackground"
+    android:gravity="bottom"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/header_padding"
+    android:paddingLeft="@dimen/header_padding"
+    android:paddingRight="@dimen/header_padding"
+    android:paddingTop="@dimen/header_padding"
+    android:theme="@style/ThemeOverlay.AppCompat.Dark">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/nav_header_vertical_spacing"
+        android:src="@drawable/header_pic" />
+</LinearLayout>

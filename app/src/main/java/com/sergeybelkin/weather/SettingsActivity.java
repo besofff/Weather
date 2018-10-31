@@ -24,7 +24,7 @@ public class SettingsActivity extends AppCompatActivity
         askWhenLeaving = findViewById(R.id.switch_ask);
 
         updateByWifi.setChecked(mConfig.isUpdatingByWifiOnly());
-        updateOnStartup.setChecked(mConfig.idUpdatingOnStartup());
+        updateOnStartup.setChecked(mConfig.isUpdatingOnStartup());
         askWhenLeaving.setChecked(mConfig.isAskingWhenLeaving());
 
         updateByWifi.setOnCheckedChangeListener(this);

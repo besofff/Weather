@@ -6,7 +6,9 @@
 
     <color name="colorBackground">#303030</color>
     <color name="detailedActivityBackground">#6200ea</color>
-    <color name="colorText">#ffffff</color>
+    <color name="textColorWhite">#ffffff</color>
+    <color name="textColorBlack">#000000</color>
+    <color name="colorHeaderBackground">#42a5f5</color>
 
     <color name="colorItem">#dd2c00</color>
     <color name="colorItemImage">#ff3d00</color>

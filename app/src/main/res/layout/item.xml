@@ -36,21 +36,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="date"
-            android:textColor="@color/colorText"/>
+            android:textColor="@color/textColorWhite"/>
 
         <TextView
             android:id="@+id/item_temp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="temperature"
-            android:textColor="@color/colorText"/>
+            android:textColor="@color/textColorWhite"/>
 
         <TextView
             android:id="@+id/item_pressure"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="pressure"
-            android:textColor="@color/colorText"/>
+            android:textColor="@color/textColorWhite"/>
     </LinearLayout>
 
 </LinearLayout>
