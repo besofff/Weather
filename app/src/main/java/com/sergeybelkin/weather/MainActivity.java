@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity
     Config mConfig;
 
     ImageView pic;
-    TextView cityName, temperature, humidity, pressure, wind_speed;
+    TextView date, cityName, temperature, humidity, pressure, wind_speed;
 
     AlertDialog netDialog, geoDialog, confirmDialog;
 
@@ -67,7 +67,8 @@ public class MainActivity extends AppCompatActivity
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                this, drawer, toolbar,
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
@@ -83,6 +84,7 @@ public class MainActivity extends AppCompatActivity
         mTask.link(this);
 
         pic = findViewById(R.id.pic);
+        date = findViewById(R.id.date);
         cityName = findViewById(R.id.city);
         temperature = findViewById(R.id.temperature);
         humidity = findViewById(R.id.humidity);
@@ -392,6 +394,7 @@ public class MainActivity extends AppCompatActivity
     private void showCurrentWeather(Weather weather) {
         if (weather != null) {
             pic.setImageResource(getImageResId(weather));
+            date.setText(weather.getDate());
             cityName.setText(weather.getName());
             temperature.setText(weather.getTemperature());
             humidity.setText(weather.getHumidity());

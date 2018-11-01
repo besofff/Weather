@@ -37,14 +37,14 @@ public class Forecast implements Serializable{
 
     public String getDate(){
         long timestampMillis = TimeUnit.SECONDS.toMillis(forecastDate);
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEEE, dd MMMM, HH:mm");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EE, dd MMMM, HH:mm");
         simpleDateFormat.setTimeZone(TimeZone.getDefault());
         return simpleDateFormat.format(new Date(timestampMillis));
     }
 
     public String getTemperature(){
         double temp = (double) Math.round(getMain().getTemperature()*10)/10;
-        return temp + " °C";
+        return temp + "°";
     }
 
     public void setTemperature(double temperature){

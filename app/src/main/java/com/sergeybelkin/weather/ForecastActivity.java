@@ -1,9 +1,8 @@
 package com.sergeybelkin.weather;
 
-import android.app.ListActivity;
-import android.content.Intent;
+
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -16,15 +15,17 @@ import com.sergeybelkin.weather.model.Weather;
 
 import java.util.List;
 
-public class ForecastActivity extends ListActivity {
+public class ForecastActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_forecast);
 
         Weather weather = (Weather) getIntent().getSerializableExtra(Constants.PARAM_WEATHER);
         MyAdapter adapter = new MyAdapter(weather.getForecasts());
-        setListAdapter(adapter);
+        ListView forecastList = findViewById(R.id.forecast_list);
+        forecastList.setAdapter(adapter);
     }
 
     class MyAdapter extends BaseAdapter {
@@ -71,13 +72,15 @@ public class ForecastActivity extends ListActivity {
             if (count == colors.length) count = 0;
 
             ImageView pic = view.findViewById(R.id.item_pic);
+            TextView temperature = view.findViewById(R.id.item_temp);
             TextView date = view.findViewById(R.id.item_date);
-            TextView temp = view.findViewById(R.id.item_temp);
+            TextView humidity = view.findViewById(R.id.item_humidity);
             TextView pressure = view.findViewById(R.id.item_pressure);
 
             pic.setImageResource(getImageResId(forecast));
+            temperature.setText(forecast.getTemperature());
             date.setText(forecast.getDate());
-            temp.setText(forecast.getTemperature());
+            humidity.setText(forecast.getHumidity());
             pressure.setText(forecast.getPressure());
 
             return view;

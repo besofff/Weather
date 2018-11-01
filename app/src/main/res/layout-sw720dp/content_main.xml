@@ -10,8 +10,8 @@
 
     <ImageView
         android:id="@+id/pic"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
+        android:layout_width="400dp"
+        android:layout_height="400dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/relativeLayout"
         app:layout_constraintStart_toStartOf="parent"
@@ -33,7 +33,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:textSize="20sp"
+            android:textSize="40sp"
             android:textColor="@color/textColorBlack"
             tools:text="date"/>
 
@@ -44,7 +44,7 @@
             android:layout_below="@id/date"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="5dp"
-            android:textSize="40sp"
+            android:textSize="60sp"
             android:textColor="@color/textColorBlack"
             tools:text="city"/>
 
@@ -55,7 +55,7 @@
             android:layout_below="@id/city"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="5dp"
-            android:textSize="40sp"
+            android:textSize="60sp"
             android:textColor="@color/textColorBlack"
             tools:text="+3 C" />
 
@@ -66,6 +66,7 @@
             android:layout_below="@id/temperature"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="5dp"
+            android:textSize="30sp"
             android:textColor="@color/textColorBlack"
             tools:text="Pressure" />
 
@@ -76,6 +77,7 @@
             android:layout_below="@id/pressure"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="5dp"
+            android:textSize="30sp"
             android:textColor="@color/textColorBlack"
             tools:text="humidity"/>
 
@@ -86,6 +88,7 @@
             android:layout_below="@id/humidity"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="5dp"
+            android:textSize="30sp"
             android:textColor="@color/textColorBlack"
             tools:text="wind" />
     </RelativeLayout>

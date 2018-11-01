@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <dimen name="horizontal_dimen">10dp</dimen>
-    <dimen name="vertical_dimen">20dp</dimen>
-    <dimen name="settings_item_size">20sp</dimen>
-    <dimen name="text_size_large">40sp</dimen>
     <dimen name="header_padding">16dp</dimen>
     <dimen name="nav_header_vertical_spacing">8dp</dimen>
 </resources>

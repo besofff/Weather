@@ -2,9 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="5dp"
-    android:paddingLeft="5dp"
-    android:paddingRight="5dp"
+    android:paddingTop="10dp"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
     xmlns:tools="http://schemas.android.com/tools">
 
     <LinearLayout
@@ -15,12 +15,12 @@
 
         <ImageView
             android:id="@+id/item_pic"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
             tools:src="@drawable/_01d"/>
 
         <TextView
@@ -28,8 +28,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginRight="5dp"
-            android:textSize="35sp"
+            android:layout_marginRight="10dp"
+            android:textSize="40sp"
             android:textColor="@color/textColorBlack"
             tools:text="+3°"/>
     </LinearLayout>

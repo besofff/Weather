@@ -18,7 +18,7 @@
         android:layout_marginRight="8dp"
         android:layout_marginBottom="20dp"
         android:textColor="@color/textColorBlack"
-        android:textSize="20sp"
+        android:textSize="40sp"
         app:layout_constraintBottom_toTopOf="@+id/city"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -34,7 +34,7 @@
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
         android:textColor="@color/textColorBlack"
-        android:textSize="40sp"
+        android:textSize="60sp"
         app:layout_constraintBottom_toTopOf="@+id/pic"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -42,8 +42,8 @@
 
     <ImageView
         android:id="@+id/pic"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
+        android:layout_width="500dp"
+        android:layout_height="500dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginLeft="8dp"
@@ -86,6 +86,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/temperature"
         tools:text="Pressure"
+        android:textSize="30sp"
         android:textColor="@color/textColorBlack"/>
 
     <TextView
@@ -101,6 +102,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/pressure"
         tools:text="humidity"
+        android:textSize="30sp"
         android:textColor="@color/textColorBlack"/>
 
     <TextView
@@ -116,6 +118,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/humidity"
         tools:text="wind"
+        android:textSize="30sp"
         android:textColor="@color/textColorBlack"/>
 
 

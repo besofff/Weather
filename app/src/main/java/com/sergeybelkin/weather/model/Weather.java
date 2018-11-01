@@ -5,8 +5,12 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 public class Weather implements Serializable{
 
@@ -73,6 +77,13 @@ public class Weather implements Serializable{
 
     public void setCalculationDate(Integer calculationDate) {
         this.calculationDate = calculationDate;
+    }
+
+    public String getDate(){
+        long timestampMillis = TimeUnit.SECONDS.toMillis(calculationDate);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EE, dd MMMM");
+        simpleDateFormat.setTimeZone(TimeZone.getDefault());
+        return simpleDateFormat.format(new Date(timestampMillis));
     }
 
     public String getName() {
