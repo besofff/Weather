@@ -283,7 +283,6 @@ public class MainActivity extends AppCompatActivity
             double latitude = (double) Math.round(location.getLatitude() * 100) / 100;
             double longitude = (double) Math.round(location.getLongitude() * 100) / 100;
             Double[] coordinates = new Double[]{latitude, longitude};
-            Log.i("log", "lat="+latitude + ", lon=" + longitude);
 
             if (!mConfig.isUpdatingOnStartup()) {
                 showCachedWeather(latitude, longitude);
