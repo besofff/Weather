@@ -69,16 +69,20 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         if (cursor.moveToFirst()){
             long currentTime = System.currentTimeMillis()/1000;
             long calcTime = cursor.getInt(cursor.getColumnIndex(DB_KEY_FORECAST_DATE));
-            if ((currentTime - calcTime) < 60 * 30) return cursor;
+            if ((currentTime - calcTime) < 60 * 60) return cursor;
         }
         return null;
     }
 
     public boolean isCacheRelevant(double latitude, double longitude){
-        return checkCacheRelevance(latitude, longitude) != null;
+        Cursor cursor = checkCacheRelevance(latitude, longitude);
+        if (cursor != null) {
+            cursor.close();
+            return true;
+        } else return false;
     }
 
-    public Weather getWeather(double latitude, double longitude){
+    public Weather getCachedWeather(double latitude, double longitude){
 
         Cursor cursor = checkCacheRelevance(latitude, longitude);
         if (cursor != null){
@@ -102,6 +106,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
             weather.setIcon(icon);
             weather.setForecasts(getForecasts(cursor));
 
+            cursor.close();
             return weather;
         } else return null;
     }
@@ -142,8 +147,8 @@ public class DatabaseHelper extends SQLiteOpenHelper{
             SQLiteDatabase database = dbHelper.getWritableDatabase();
             database.beginTransaction();
 
-            double latitude = (double) Math.round(weather.getCoordinates().getLatitude()*10)/10;
-            double longitude = (double) Math.round(weather.getCoordinates().getLongitude()*10)/10;
+            double latitude = (double) Math.round(weather.getCoordinates().getLatitude()*100)/100;
+            double longitude = (double) Math.round(weather.getCoordinates().getLongitude()*100)/100;
 
             ContentValues cv = new ContentValues();
             cv.put(DB_KEY_TEMPERATURE, weather.getMain().getTemperature());

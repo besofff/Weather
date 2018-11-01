@@ -19,7 +19,7 @@ import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity
 
     private Weather mWeather;
 
-    LoadRelevantWeatherTask mTask;
+    LoadWeatherUpdatesTask mTask;
     DatabaseHelper mHelper;
     LocationManager mLocationManager;
     Config mConfig;
@@ -75,14 +75,6 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        mConfig = Config.getConfig(this);
-
-        mTask = (LoadRelevantWeatherTask) getLastCustomNonConfigurationInstance();
-        if (mTask == null) {
-            mTask = new LoadRelevantWeatherTask();
-        }
-        mTask.link(this);
-
         pic = findViewById(R.id.pic);
         date = findViewById(R.id.date);
         cityName = findViewById(R.id.city);
@@ -90,6 +82,13 @@ public class MainActivity extends AppCompatActivity
         humidity = findViewById(R.id.humidity);
         pressure = findViewById(R.id.pressure);
         wind_speed = findViewById(R.id.wind);
+        mConfig = Config.getConfig(this);
+
+        mTask = (LoadWeatherUpdatesTask) getLastCustomNonConfigurationInstance();
+        if (mTask == null) {
+            mTask = new LoadWeatherUpdatesTask();
+        }
+        mTask.link(this);
 
         if (savedInstanceState != null && savedInstanceState.containsKey(Constants.OUT_STATE)) {
             mWeather = (Weather) savedInstanceState.getSerializable(Constants.OUT_STATE);
@@ -174,7 +173,6 @@ public class MainActivity extends AppCompatActivity
         } else {
             showGeoMissingDialog();
         }
-
     }
 
     @Override
@@ -183,21 +181,7 @@ public class MainActivity extends AppCompatActivity
 
         if (mWeather != null) return;
 
-        if (!mConfig.isUpdatingOnStartup()) return;
-
-        if (mConfig.isUpdatingByWifiOnly()) {
-            if (ConnectionDetector.isConnectedViaWifi(this)) {
-                requestLocationUpdates();
-            } else {
-                Toast.makeText(this, "WI-FI отключен", Toast.LENGTH_SHORT).show();
-            }
-        } else {
-            if (ConnectionDetector.isConnected(this)) {
-                requestLocationUpdates();
-            } else {
-                showNetMissingDialog();
-            }
-        }
+        requestLocationUpdates();
     }
 
     private void showNetMissingDialog() {
@@ -235,7 +219,7 @@ public class MainActivity extends AppCompatActivity
         return mTask;
     }
 
-    static class LoadRelevantWeatherTask extends AsyncTask<Double, Weather, Weather> {
+    static class LoadWeatherUpdatesTask extends AsyncTask<Double, Weather, Weather> {
 
         MainActivity activity;
         private String apiKey;
@@ -299,18 +283,22 @@ public class MainActivity extends AppCompatActivity
             double latitude = (double) Math.round(location.getLatitude() * 100) / 100;
             double longitude = (double) Math.round(location.getLongitude() * 100) / 100;
             Double[] coordinates = new Double[]{latitude, longitude};
+            Log.i("log", "lat="+latitude + ", lon=" + longitude);
 
-            if (mHelper.isCacheRelevant(latitude, longitude)) {
-                Weather weather = mHelper.getWeather(latitude, longitude);
-                showCurrentWeather(weather);
-                mWeather = weather;
+            if (!mConfig.isUpdatingOnStartup()) {
+                showCachedWeather(latitude, longitude);
             } else {
-                if (mTask.getStatus() == AsyncTask.Status.FINISHED) {
-                    mTask = new LoadRelevantWeatherTask();
-                    mTask.link(MainActivity.this);
-                }
-                if (mTask.getStatus() != AsyncTask.Status.RUNNING) {
-                    mTask.execute(coordinates);
+                if (mConfig.isUpdatingByWifiOnly()) {
+                    if (ConnectionDetector.isConnectedViaWifi(MainActivity.this)) {
+                        loadWeatherUpdates(coordinates);
+                    } else {
+                        showCachedWeather(latitude, longitude);
+                    }
+                } else if (ConnectionDetector.isConnected(MainActivity.this)){
+                    loadWeatherUpdates(coordinates);
+                } else {
+                    showNetMissingDialog();
+                    showCachedWeather(latitude, longitude);
                 }
             }
 
@@ -372,22 +360,36 @@ public class MainActivity extends AppCompatActivity
                     Double[] coordinates = new Double[]{latitude, longitude};
 
                     if (mHelper.isCacheRelevant(latitude, longitude)) {
-                        Weather weather = mHelper.getWeather(latitude, longitude);
+                        Weather weather = mHelper.getCachedWeather(latitude, longitude);
                         showCurrentWeather(weather);
                         mWeather = weather;
                     } else {
-                        if (mTask.getStatus() == AsyncTask.Status.FINISHED) {
-                            mTask = new LoadRelevantWeatherTask();
-                            mTask.link(MainActivity.this);
-                        }
-                        if (mTask.getStatus() != AsyncTask.Status.RUNNING) {
-                            mTask.execute(coordinates);
-                        }
+                        loadWeatherUpdates(coordinates);
                     }
                 } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
                     Toast.makeText(this, getString(R.string.unavailable_info), Toast.LENGTH_SHORT).show();
                 }
                 break;
+        }
+    }
+
+    private void loadWeatherUpdates(Double[] coordinates){
+        if (mTask.getStatus() == AsyncTask.Status.FINISHED) {
+            mTask = new LoadWeatherUpdatesTask();
+            mTask.link(MainActivity.this);
+        }
+        if (mTask.getStatus() != AsyncTask.Status.RUNNING) {
+            mTask.execute(coordinates);
+        }
+    }
+
+    private void showCachedWeather(double latitude, double longitude) {
+        if (mHelper.isCacheRelevant(latitude, longitude)) {
+            Weather weather = mHelper.getCachedWeather(latitude, longitude);
+            showCurrentWeather(weather);
+            mWeather = weather;
+        } else {
+            Toast.makeText(MainActivity.this, "Нет сохраненных данных", Toast.LENGTH_LONG).show();
         }
     }
 

@@ -2,7 +2,7 @@
     <string name="app_name">Погода</string>
     <string name="base_url">http://api.openweathermap.org/data/2.5/</string>
     <string name="api_key">710515c42959b419fa06439a0c8430dd</string>
-    <string name="unavailable_info">Невозможно загрузить данные</string>
+    <string name="unavailable_info">Невозможно обновить данные</string>
     <string name="unavailable_geo">Невозможно определить местоположение</string>
     <string name="unavailable_permission">Нет доступа к определению местоположения</string>
     <string name="geo_title">Отсутствуют геоданные</string>
