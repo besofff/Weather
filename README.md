@@ -6,4 +6,4 @@
 
 Также есть возможность просмотра погоды в любом городе с помощью поля поиска с автодополнением.
 
-![s81101-151223](https://user-images.githubusercontent.com/15233278/47854490-864bcb00-ddea-11e8-98c0-dea376caf4e5.jpg) | ![s81101-151317](https://user-images.githubusercontent.com/15233278/47854506-91066000-ddea-11e8-823b-60ad312ba66e.jpg) | ![s81101-151322](https://user-images.githubusercontent.com/15233278/47854540-a8454d80-ddea-11e8-9dab-d5f7f41bae04.jpg)
+![s81101-151223](https://user-images.githubusercontent.com/15233278/47854490-864bcb00-ddea-11e8-98c0-dea376caf4e5.jpg) | ![s81101-151317](https://user-images.githubusercontent.com/15233278/47854506-91066000-ddea-11e8-823b-60ad312ba66e.jpg)
