@@ -88,7 +88,7 @@ public class ForecastActivity extends AppCompatActivity {
 
         private int getImageResId(Forecast forecast){
             String icon = forecast.getCondition().get(0).getIcon();
-            return getResources().getIdentifier("_" + icon, "drawable", getPackageName());
+            return getResources().getIdentifier("_" + icon, "mipmap", getPackageName());
         }
     }
 }
