@@ -131,7 +131,6 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
     private List<Forecast> getForecasts(Cursor cursor){
         List<Forecast> list = new ArrayList<>();
-        Forecast forecast = new Forecast();
 
         for (int i = 0; i < 40; i++){
             cursor.moveToNext();
@@ -142,6 +141,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
             int forecastDate = cursor.getInt(cursor.getColumnIndex(DB_KEY_FORECAST_DATE));
             String icon = cursor.getString(cursor.getColumnIndex(DB_KEY_ICON));
 
+            Forecast forecast = new Forecast();
             forecast.setTemperature(temperature);
             forecast.setPressure(pressure);
             forecast.setHumidity(humidity);
