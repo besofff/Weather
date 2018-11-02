@@ -52,21 +52,39 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         new Thread(new UpdateDBRunnable(weather)).start();
     }
 
-    private Cursor checkCache(double latitude, double longitude){
+    private Cursor checkAccurateCache(double latitude, double longitude){
         SQLiteDatabase database = dbHelper.getReadableDatabase();
         String selection = DB_KEY_LATITUDE + " = ? AND " + DB_KEY_LONGITUDE + " = ?";
         String[] selectionArgs = new String[]{latitude+"", longitude+""};
         return database.query(TABLE_NAME, null, selection, selectionArgs, null, null, null);
     }
 
+    private Cursor checkCacheInRange(double latitude, double longitude){
+        Cursor cursor = checkAccurateCache(latitude, longitude);
+
+        if (!cursor.moveToFirst()) {
+            SQLiteDatabase database = dbHelper.getReadableDatabase();
+            String[] selectionArgs = new String[]{String.valueOf(latitude-0.1),
+                    String.valueOf(latitude+0.1),
+                    String.valueOf(longitude-0.1),
+                    String.valueOf(longitude+0.1)};
+            String sqlQuery = "SELECT * FROM " + TABLE_NAME + " WHERE " + DB_KEY_LATITUDE +
+                    " BETWEEN ? AND ? AND " + DB_KEY_LONGITUDE + " BETWEEN ? AND ?";
+            cursor = database.rawQuery(sqlQuery, selectionArgs);
+            if (cursor.moveToFirst()){
+                return cursor;
+            } else return null;
+        } else return cursor;
+    }
+
     private boolean isCachePresent(double latitude, double longitude){
-        Cursor cursor = checkCache(latitude, longitude);
+        Cursor cursor = checkAccurateCache(latitude, longitude);
         return cursor.moveToFirst();
     }
 
     private Cursor checkCacheRelevance(double latitude, double longitude){
-        Cursor cursor = checkCache(latitude, longitude);
-        if (cursor.moveToFirst()){
+        Cursor cursor = checkCacheInRange(latitude, longitude);
+        if (cursor != null){
             long currentTime = System.currentTimeMillis()/1000;
             long calcTime = cursor.getInt(cursor.getColumnIndex(DB_KEY_FORECAST_DATE));
             if ((currentTime - calcTime) < 60 * 60) return cursor;
@@ -113,7 +131,8 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
     private List<Forecast> getForecasts(Cursor cursor){
         List<Forecast> list = new ArrayList<>();
-        while (cursor.moveToNext()){
+        for (int i = 0; i < 40; i++){
+            cursor.moveToNext();
             double temperature = cursor.getDouble(cursor.getColumnIndex(DB_KEY_TEMPERATURE));
             double pressure = cursor.getDouble(cursor.getColumnIndex(DB_KEY_PRESSURE));
             int humidity = cursor.getInt(cursor.getColumnIndex(DB_KEY_HUMIDITY));

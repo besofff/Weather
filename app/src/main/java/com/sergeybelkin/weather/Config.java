@@ -6,13 +6,19 @@ import android.content.SharedPreferences;
 public class Config {
 
     private SharedPreferences mPreferences;
+    private static Config mConfig;
 
     public static Config getConfig(Context context){
-        return new Config(context);
+        if (mConfig == null){
+            mConfig = new Config(context);
+        }
+        return mConfig;
     }
 
     private Config(Context context){
-        mPreferences = context.getSharedPreferences(Constants.APP_PREFS, Context.MODE_PRIVATE);
+        mPreferences = context
+                .getApplicationContext()
+                .getSharedPreferences(Constants.APP_PREFS, Context.MODE_PRIVATE);
     }
 
     public void setUpdateByWifiOnly(boolean isUpdatingByWifiOnly){
