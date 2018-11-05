@@ -73,13 +73,19 @@ public class DatabaseHelper extends SQLiteOpenHelper{
             cursor = database.rawQuery(sqlQuery, selectionArgs);
             if (cursor.moveToFirst()){
                 return cursor;
-            } else return null;
+            } else {
+                cursor.close();
+                return null;
+            }
         } else return cursor;
     }
 
     private boolean isCachePresent(double latitude, double longitude){
         Cursor cursor = checkAccurateCache(latitude, longitude);
-        return cursor.moveToFirst();
+        if (cursor.moveToFirst()){
+            cursor.close();
+            return true;
+        } else return false;
     }
 
     private Cursor checkCacheRelevance(double latitude, double longitude){
@@ -180,11 +186,12 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
             if (isCachePresent(latitude, longitude)){
                 String selection = "_id = ? AND " + DB_KEY_LATITUDE + " = ? AND " + DB_KEY_LONGITUDE + " = ?";
-                database.update(TABLE_NAME, cv, selection, new String[]{"1", latitude+"", longitude+""});
-                for (int i = 0; i < weather.getForecasts().size(); i++){
+                database.update(TABLE_NAME, cv, selection,
+                        new String[]{String.valueOf(1), String.valueOf(latitude), String.valueOf(longitude)});
+                for (int i = 2; i < weather.getForecasts().size() + 2; i++){
                     ContentValues values = getContentValues(weather.getForecasts().get(i));
                     database.update(TABLE_NAME, values, selection,
-                            new String[]{String.valueOf(i+2), String.valueOf(latitude), String.valueOf(longitude)});
+                            new String[]{String.valueOf(i), String.valueOf(latitude), String.valueOf(longitude)});
                 }
             } else {
                 cv.put(DB_KEY_NAME, weather.getName());

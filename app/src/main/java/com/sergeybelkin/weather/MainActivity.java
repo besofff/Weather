@@ -388,7 +388,7 @@ public class MainActivity extends AppCompatActivity
             showCurrentWeather(weather);
             mWeather = weather;
         } else {
-            Toast.makeText(MainActivity.this, "Нет сохраненных данных", Toast.LENGTH_LONG).show();
+            Toast.makeText(MainActivity.this, getString(R.string.unavailable_cache), Toast.LENGTH_LONG).show();
         }
     }
 

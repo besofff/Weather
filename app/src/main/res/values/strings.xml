@@ -5,6 +5,7 @@
     <string name="unavailable_info">Невозможно обновить данные</string>
     <string name="unavailable_geo">Невозможно определить местоположение</string>
     <string name="unavailable_permission">Нет доступа к определению местоположения</string>
+    <string name="unavailable_cache">Отсутствуют сохраненные данные</string>
     <string name="geo_title">Отсутствуют геоданные</string>
     <string name="geo_message">Для работы приложения необходимо включить получение данных о местоположении устройства</string>
     <string name="net_title">Отсутствует подключение</string>
@@ -17,8 +18,8 @@
     <string name="settings_update_start">Обновлять при старте</string>
     <string name="settings_ask">Спрашивать при выходе</string>
 
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="navigation_drawer_open">Открыть боковое меню</string>
+    <string name="navigation_drawer_close">Закрыть боковое меню</string>
 
     <string name="nav_search">Поиск</string>
     <string name="nav_current">Погода на сегодня</string>
