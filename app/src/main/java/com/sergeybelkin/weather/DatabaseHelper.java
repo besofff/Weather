@@ -188,10 +188,10 @@ public class DatabaseHelper extends SQLiteOpenHelper{
                 String selection = "_id = ? AND " + DB_KEY_LATITUDE + " = ? AND " + DB_KEY_LONGITUDE + " = ?";
                 database.update(TABLE_NAME, cv, selection,
                         new String[]{String.valueOf(1), String.valueOf(latitude), String.valueOf(longitude)});
-                for (int i = 2; i < weather.getForecasts().size() + 2; i++){
+                for (int i = 0; i < weather.getForecasts().size(); i++){
                     ContentValues values = getContentValues(weather.getForecasts().get(i));
                     database.update(TABLE_NAME, values, selection,
-                            new String[]{String.valueOf(i), String.valueOf(latitude), String.valueOf(longitude)});
+                            new String[]{String.valueOf(i+2), String.valueOf(latitude), String.valueOf(longitude)});
                 }
             } else {
                 cv.put(DB_KEY_NAME, weather.getName());
